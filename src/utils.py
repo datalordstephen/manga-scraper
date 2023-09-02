@@ -3,17 +3,41 @@ from urllib.parse import urljoin
 import requests
 from bs4 import BeautifulSoup
 import os
+from selenium.webdriver import Chrome, ChromeOptions
+from selenium.webdriver.chrome.service import Service
+
+DRIVER_PATH = "C:/path/chromedriver.exe"
 
 def get_number_of_chapters(base_url: str, name: str) -> int:
     formatted_str = name.title().replace(" ", "-")
     url = urljoin(base_url, formatted_str)
-    res = requests.get(url)
-    print(res.status_code)
+    print("Getting number of chapters of {}...".format(formatted_str))
+    print(url)
     
-    if res.status_code == 200:
-        soup = BeautifulSoup(res.text, "html.parser")
-        spans = soup.find_all("span")
-        print(spans)
+    service = Service(executable_path=DRIVER_PATH)
+    options = ChromeOptions()
+    options.add_argument("--headless=new")
+    options.add_experimental_option("excludeSwitches", ["enable-logging"])
+    
+    
+    driver = Chrome(service=service, options=options)
+    driver.get(url)
+    soup = BeautifulSoup(driver.page_source, "html.parser")
+    driver.quit()
+    
+    html_attrs = {
+        "class": "ng-binding",
+        "style": "font-weight:600"
+    }
+    
+    latest_chapter_span = soup.find("span", attrs= html_attrs)
+    
+    latest_chapter = latest_chapter_span.text.strip()
+    chapter = latest_chapter.split()[1]
+    print(f"{formatted_str} currently ends at chapter {chapter}")
+    
+    return int(chapter)
+
     
 
 def get_image_url(base_url: str, name: str, chapter: int, page: int) -> str:

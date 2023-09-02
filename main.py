@@ -5,6 +5,7 @@ import os
 import click
 import shutil
 from src.utils import get_image_url, download_page, get_number_of_chapters
+import sys
 
 BASE_URL = "https://www.mangasee123.com/manga/"
 BASE_IMG_URL = "https://hot.leanbox.us/manga/"
@@ -17,7 +18,7 @@ BASE_IMG_URL = "https://hot.leanbox.us/manga/"
 
 def main(name, start, last, save_dir) -> None:
     no_chapters = get_number_of_chapters(BASE_URL, name)
-    SystemExit()
+    sys.exit(0)
     
     
     if os.path.exists(save_dir):
