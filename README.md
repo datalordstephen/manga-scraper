@@ -41,4 +41,4 @@ This is still in development, so for the meantime I'm sure that these manga woul
 * **Attack on Titan**
 * **My Hero Academia**
 * **Demon Slayer**
-
+* **Vinland Saga**
