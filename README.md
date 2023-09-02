@@ -13,13 +13,20 @@ To install this project, `clone` the repo, `cd` into the directory
   cd manga-scraper
 ```
 
-Next is to install requirements
+Next is to install the requirements
 ```
 pip install -r requirements.txt
 ```
 
 To use, run the file with the arguments listed above e.g
 ```bash
-py main.py --name "vinland saga" --path ./download
+py main.py --name "attack on titan" --end 20
 ```
-    
+## Side Notes
+
+This is still in development, so for the meantime I'm sure that these manga would get downloaded:
+
+* **Attack on Titan**
+* **My Hero Academia**
+* **Demon Slayer**
+
