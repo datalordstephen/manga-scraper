@@ -6,7 +6,7 @@ import os
 from selenium.webdriver import Chrome, ChromeOptions
 from selenium.webdriver.chrome.service import Service
 
-DRIVER_PATH = "C:/path/chromedriver.exe"
+DRIVER_PATH = os.path.join(os.getcwd(), "chromedriver.exe")
 API_URL = "https://webdis-9a33.onrender.com/search"
 
 def convert_anime_name(formatted_str: str) -> str:
@@ -23,7 +23,7 @@ def get_number_of_chapters(base_url: str, name: str) -> int:
     right_name = right_name.title().replace(" ", "-")
     
     if right_name != formatted_str:
-        print(f"By {name} did you mean {right_name}?")
+        print(f"By '{name}' did you mean '{right_name}'?")
         formatted_str = right_name
         
     url = urljoin(base_url, formatted_str)

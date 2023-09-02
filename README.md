@@ -4,7 +4,17 @@ This is a simple `CLI` tool made with the **click** library. It simply takes in 
 
 Manga is downloaded from [MangaSee](https://www.mangasee123.com/), a free website to download manga from. It downloads the manga and saves it to your local machine.
 
+## Prerequisites
 
+A prerequisite to run this is to have **[Google Chrome](https://www.google.com/chrome/)** installed on your computer, as well as a **Chromedriver** executeable file.
+
+If your chrome version is *114.0.5735.90* or lower, you can download it [here](https://chromedriver.chromium.org/downloads). If it's a newer version of chrome, you can download a stable version of the executeable from [here](https://googlechromelabs.github.io/chrome-for-testing/)
+
+To check your chrome version, paste this link in your chrome browser:
+
+```
+chrome://settings/help
+```
 ## Installation / Usage
 
 To install this project, `clone` the repo, `cd` into the directory
@@ -17,6 +27,8 @@ Next is to install the requirements
 ```
 pip install -r requirements.txt
 ```
+After that, place the `chromedriver.exe` downloaded earlier in this directory (i.e `manga-scraper`). This step is necessary as the driver is needed.
+
 
 To use, run the file with the arguments listed above e.g
 ```bash

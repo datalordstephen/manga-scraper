@@ -42,7 +42,7 @@ def main(name, start, end, save_dir) -> None:
         page_num = 1
         
         while True:
-            img_url = get_image_url(BASE_IMG_URL, name, chapter_num, page_num)
+            img_url = get_image_url(BASE_IMG_URL, formatted_name, chapter_num, page_num)
                         
             chapter_ended = download_page(img_url, page_num, chapter_path, page_num)
             
