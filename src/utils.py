@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 import os
 from selenium.webdriver import Chrome, ChromeOptions
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
 
 DRIVER_PATH = os.path.join(os.getcwd(), "chromedriver.exe")
 API_URL = "https://webdis-9a33.onrender.com/search"
@@ -16,7 +17,7 @@ def convert_anime_name(formatted_str: str) -> str:
     value = data[0]["animeTitle"]
     return value
 
-def get_number_of_chapters(base_url: str, name: str) -> int:
+def get_chapter_details(base_url: str, name: str):
     formatted_str = name.title().replace(" ", "-")
     
     right_name = convert_anime_name(formatted_str)
@@ -27,7 +28,7 @@ def get_number_of_chapters(base_url: str, name: str) -> int:
         formatted_str = right_name
         
     url = urljoin(base_url, formatted_str)
-    print("Getting number of chapters of {}...".format(formatted_str))
+    print("Getting the list of chapters of {}...".format(formatted_str))
     
     service = Service(executable_path=DRIVER_PATH)
     options = ChromeOptions()
@@ -37,6 +38,7 @@ def get_number_of_chapters(base_url: str, name: str) -> int:
     
     driver = Chrome(service=service, options=options)
     driver.get(url)
+    driver.find_element(By.CSS_SELECTOR, "div[class='list-group-item ShowAllChapters ng-scope']").click()
     soup = BeautifulSoup(driver.page_source, "html.parser")
     driver.quit()
     
@@ -45,21 +47,26 @@ def get_number_of_chapters(base_url: str, name: str) -> int:
         "style": "font-weight:600"
     }
     
-    latest_chapter_span = soup.find("span", attrs= html_attrs)
+    chapter_span = soup.find_all("span", attrs= html_attrs)
+    chapters = [str(chapter.text).strip().split()[1] for chapter in chapter_span]
     
-    latest_chapter = latest_chapter_span.text.strip()
-    chapter = latest_chapter.split()[1]
-    print(f"{formatted_str} currently ends at chapter {chapter}")
+    chapters = process_chapter_list(chapters)
+    most_recent = chapters[0]
+    
+    print(f"{formatted_str} currently ends at chapter {most_recent}")
     print("-" * 50)
     
-    return int(chapter), formatted_str
+    return most_recent, formatted_str, chapters
 
     
 
-def get_image_url(base_url: str, name: str, chapter: int, page: int) -> str:
+def get_image_url(base_url: str, name: str, chapter, page: int) -> str:
     formatted_str = name.title().replace(" ", "-")
     
-    zeros = (4 - len(str(chapter))) * "0"
+    if type(chapter) == float:
+        zeros = (4 - len(str(int(chapter)))) * "0"
+    else:
+        zeros = (4 - len(str(chapter))) * "0"
     _chapter = f"{zeros}{chapter}"
     
     page_zeros = (3 - len(str(page))) * "0"
@@ -86,6 +93,23 @@ def download_page(img_url: str, output_path: str, chapter_path: str, page_num: i
     
     return not_found
         
+def process_chapter_list(chapters_list: list[str]) -> list:
+    to_return = []
+    for chapter in chapters_list:
+        try:
+            res = int(chapter)
+        except ValueError:
+            res = float(chapter)
+        to_return.append(res)
+    
+    assert len(to_return) == len(chapters_list), "Something went wrong"
+    return to_return
+
+def format_input(end: float):
+    if int(end) == end:
+        return int(end)
+    else:
+        return end
     
 if __name__ == "__main__":
     name = input("Enter an anime: ")

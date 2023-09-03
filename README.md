@@ -29,6 +29,10 @@ pip install -r requirements.txt
 ```
 After that, place the `chromedriver.exe` downloaded earlier in this directory (i.e `manga-scraper`). This step is necessary as the driver is needed.
 
+To see all arguments and their defaults, run:
+```bash
+py main.py --help
+```
 
 To use, run the file with the arguments listed above e.g
 ```bash
