@@ -46,3 +46,8 @@ This is still in development, so for the meantime I'm sure that these manga woul
 * **My Hero Academia**
 * **Demon Slayer**
 * **Vinland Saga**
+
+## Update
+The tool should be able to successfully download ANY manga on the mangasee website. Working on checking availability on the website and supporting other download sites 
+
+Yours Sincerely **o_O**
