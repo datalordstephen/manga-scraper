@@ -4,10 +4,10 @@ import os
 from tqdm import tqdm
 import click
 import shutil
-from src.utils import get_image_url, download_page, get_chapter_details, format_input
+from src.utils import * 
 
 BASE_URL = "https://www.mangasee123.com/manga/"
-BASE_IMG_URL = "https://hot.leanbox.us/manga/"
+BASE_IMG_URL = ""
 
 @click.command()
 @click.option('--name', default="vinland saga", help = "Name of manga you want to download (default: Vinland saga)")
@@ -32,27 +32,34 @@ def main(name, start, end, save_dir) -> None:
         
     os.makedirs(save_dir)
     print("Created: {}".format(save_dir))
-    print("-" *50, end="\n\n")
-        
+    print("-" *50)
+    
     print(f"Dowloading chapters {start} to {end} of {formatted_name}".title())
     
     chapters.reverse()
     chap_range = chapters[chapters.index(start):chapters.index(end) + 1]
-    
-    for chapter_num in tqdm(chap_range, desc="Chapters Downloaded", ncols=100):
+
+    for chapter_num in chap_range:
         chapter_path = os.path.join(save_dir, f"chap-{chapter_num}")
         os.mkdir(chapter_path)
-        page_num = 1
         
-        while True:
-            img_url = get_image_url(BASE_IMG_URL, formatted_name, chapter_num, page_num)
-                        
-            chapter_ended = download_page(img_url, page_num, chapter_path, page_num)
-            
-            if not chapter_ended:
-                page_num += 1
-            else:
-                break
+        check_url = False if chapter_num != start else True
+        num_pages, result = get_manga_details(BASE_URL, formatted_name, chapter_num, check_url)
+        BASE_IMG_URL = result if check_url else BASE_IMG_URL
+        
+        for page_num in tqdm(range(1, num_pages + 1), desc=f"Chapter {chapter_num}", ncols=100):
+            while True:
+                img_url = get_image_url(BASE_IMG_URL, formatted_name, chapter_num, page_num)
+                            
+                new_base_image_url = download_page(img_url, page_num, chapter_path, page_num)
+                
+                if new_base_image_url:
+                    print("\nDetected a change in the cloud storage location, checking again...")
+                    _, BASE_IMG_URL = get_manga_details(BASE_URL, formatted_name, chapter_num)
+                    continue
+                else:
+                    break
+
     print("\nDownload Completed!")
         
             

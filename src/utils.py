@@ -1,11 +1,11 @@
-# import requests
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 import requests
 from bs4 import BeautifulSoup
 import os
 from selenium.webdriver import Chrome, ChromeOptions
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+from selenium.common.exceptions import TimeoutException
 
 DRIVER_PATH = os.path.join(os.getcwd(), "chromedriver.exe")
 API_URL = "https://webdis-9a33.onrender.com/search"
@@ -16,6 +16,17 @@ def convert_anime_name(formatted_str: str) -> str:
     data = res.json()
     value = data[0]["animeTitle"]
     return value
+
+def create_driver(headless: bool = True) -> Chrome:
+    service = Service(executable_path=DRIVER_PATH)
+    options = ChromeOptions()
+    options.add_experimental_option("excludeSwitches", ["enable-logging"])
+    if headless:
+        options.add_argument("--headless=new")
+    
+    driver = Chrome(service=service, options=options)
+    return driver
+
 
 def get_chapter_details(base_url: str, name: str):
     formatted_str = name.title().replace(" ", "-")
@@ -28,15 +39,7 @@ def get_chapter_details(base_url: str, name: str):
         formatted_str = right_name
         
     url = urljoin(base_url, formatted_str)
-    print("Getting the list of chapters of {}...".format(formatted_str))
-    
-    service = Service(executable_path=DRIVER_PATH)
-    options = ChromeOptions()
-    options.add_argument("--headless=new")
-    options.add_experimental_option("excludeSwitches", ["enable-logging"])
-    
-    
-    driver = Chrome(service=service, options=options)
+    driver = create_driver()
     driver.get(url)
     driver.find_element(By.CSS_SELECTOR, "div[class='list-group-item ShowAllChapters ng-scope']").click()
     soup = BeautifulSoup(driver.page_source, "html.parser")
@@ -47,8 +50,8 @@ def get_chapter_details(base_url: str, name: str):
         "style": "font-weight:600"
     }
     
-    chapter_span = soup.find_all("span", attrs= html_attrs)
-    chapters = [str(chapter.text).strip().split()[1] for chapter in chapter_span]
+    chapter_spans = soup.find_all("span", attrs= html_attrs)
+    chapters = [str(chapter.text).strip().split()[1] for chapter in chapter_spans]
     
     chapters = process_chapter_list(chapters)
     most_recent = chapters[0]
@@ -58,6 +61,40 @@ def get_chapter_details(base_url: str, name: str):
     
     return most_recent, formatted_str, chapters
 
+    
+def get_manga_details(base_url: str, formatted_name: str, chapter, check_url: bool = True) -> tuple[int, str]:
+    first_part = base_url.replace("manga/", "")
+    second_part = f"read-online/{formatted_name}-chapter-{chapter}-page-1.html"
+    page_1_url = urljoin(first_part, second_part)
+    
+    if check_url:
+        print("-" *50)
+        print("Getting the details of {} Chapter {}...".format(formatted_name, chapter))
+    
+    driver = create_driver()
+    driver.set_page_load_timeout(7)
+    
+    try:
+        driver.get(page_1_url)
+    except TimeoutException:
+        driver.execute_script("window.stop();")
+    
+    soup = BeautifulSoup(driver.page_source, "html.parser")
+    driver.quit()
+    
+    page_buttons = soup.find_all("button", attrs={"ng-click":"vm.GoToPage(Page)"})
+    page_buttons = [int(str(page_num.text).strip()) for page_num in page_buttons]
+    no_of_pages = page_buttons[-1]
+    
+    img_url = None
+    if check_url:
+        img = soup.find("img", attrs={"class": "img-fluid HasGap"})
+        img_url = img["src"]
+        img_url = img_url[:img_url.find(formatted_name)]
+        
+    print('-' * 50)
+    return no_of_pages, img_url
+    
     
 
 def get_image_url(base_url: str, name: str, chapter, page: int) -> str:
@@ -112,6 +149,5 @@ def format_input(end: float):
         return end
     
 if __name__ == "__main__":
-    name = input("Enter an anime: ")
-    convert_anime_name(name)
+    get_manga_details("https://www.mangasee123.com/manga/", "Vinland-Saga", 193)
     
