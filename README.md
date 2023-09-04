@@ -6,9 +6,9 @@ Manga is downloaded from [MangaSee](https://www.mangasee123.com/), a free websit
 
 ## Prerequisites
 
-A prerequisite to run this is to have **[Google Chrome](https://www.google.com/chrome/)** installed on your computer, as well as a **Chromedriver** executeable file.
+A prerequisite to run this is to have **[Google Chrome](https://www.google.com/chrome/)** installed on your computer, as well as a **Chromedriver** executable file.
 
-If your chrome version is *114.0.5735.90* or lower, you can download it [here](https://chromedriver.chromium.org/downloads). If it's a newer version of chrome, you can download a stable version of the executeable from [here](https://googlechromelabs.github.io/chrome-for-testing/)
+If your chrome version is *114.0.5735.90* or lower, you can download it [here](https://chromedriver.chromium.org/downloads). If it's a newer version of chrome, you can download a stable version of the executable from [here](https://googlechromelabs.github.io/chrome-for-testing/)
 
 To check your chrome version, paste this link in your chrome browser:
 
