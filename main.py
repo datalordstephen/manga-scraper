@@ -49,7 +49,7 @@ def main(name, start, end, save_dir) -> None:
         
         for page_num in tqdm(range(1, num_pages + 1), desc=f"Chapter {chapter_num}", ncols=100):
             while True:
-                img_url = get_image_url(BASE_IMG_URL, formatted_name, chapter_num, page_num)
+                img_url = get_image_url(BASE_IMG_URL, chapter_num, page_num)
                             
                 new_base_image_url = download_page(img_url, page_num, chapter_path, page_num)
                 

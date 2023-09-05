@@ -1,4 +1,4 @@
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin
 import requests
 from bs4 import BeautifulSoup
 import os
@@ -72,7 +72,7 @@ def get_manga_details(base_url: str, formatted_name: str, chapter, check_url: bo
         print("Getting the details of {} Chapter {}...".format(formatted_name, chapter))
     
     driver = create_driver()
-    driver.set_page_load_timeout(7)
+    driver.set_page_load_timeout(10)
     
     try:
         driver.get(page_1_url)
@@ -90,16 +90,13 @@ def get_manga_details(base_url: str, formatted_name: str, chapter, check_url: bo
     if check_url:
         img = soup.find("img", attrs={"class": "img-fluid HasGap"})
         img_url = img["src"]
-        img_url = img_url[:img_url.find(formatted_name)]
+        parts = img_url.split("/")
+        img_url = "/".join(parts[:-1])
         
     print('-' * 50)
     return no_of_pages, img_url
-    
-    
 
-def get_image_url(base_url: str, name: str, chapter, page: int) -> str:
-    formatted_str = name.title().replace(" ", "-")
-    
+def get_image_url(base_url: str, chapter, page: int) -> str:
     if type(chapter) == float:
         zeros = (4 - len(str(int(chapter)))) * "0"
     else:
@@ -110,9 +107,9 @@ def get_image_url(base_url: str, name: str, chapter, page: int) -> str:
     _page = f"{page_zeros}{page}"
     
     joined = f"{_chapter}-{_page}.png"
-    sub_url = formatted_str + "/" + joined
+    sub_url = joined
     
-    search_url = urljoin(base_url, sub_url)
+    search_url = urljoin(base_url + '/', sub_url)
     return search_url
 
 
@@ -149,5 +146,5 @@ def format_input(end: float):
         return end
     
 if __name__ == "__main__":
-    get_manga_details("https://www.mangasee123.com/manga/", "Vinland-Saga", 193)
+    get_manga_details("https://www.mangasee123.com/manga/", "Berserk", 1)
     
