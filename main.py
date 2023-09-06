@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import time
 import os
 from tqdm import tqdm
 import click
@@ -38,7 +39,8 @@ def main(name, start, end, save_dir) -> None:
     
     chapters.reverse()
     chap_range = chapters[chapters.index(start):chapters.index(end) + 1]
-
+    
+    start_time = time.time()
     for chapter_num in chap_range:
         chapter_path = os.path.join(save_dir, f"chap-{chapter_num}")
         os.mkdir(chapter_path)
@@ -59,8 +61,9 @@ def main(name, start, end, save_dir) -> None:
                     continue
                 else:
                     break
-
+    end_time = time.time()
     print("\nDownload Completed!")
+    print("It took {} seconds to download {} from chapters {} to {}".format(end_time - start_time, name, start, end))
         
             
         
